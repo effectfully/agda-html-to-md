@@ -26,13 +26,13 @@ extractStyle
     . breakOn "<style"
 
 tweakStyle :: Text -> Text
-tweakStyle text = mconcat [beforeA, style, afterA] where
+tweakStyle text = Text.concat [beforeA, style, afterA] where
     (beforeA, afterA) = fmap (snd . unsafeBreakDrop "}") $ unsafeBreakDrop "      a {" text
 
     style = Text.unlines $ Prelude.map ("      " <>)
       [ "code {                               "
       , "  white-space: pre;                  "
-      , "  background-color: #f6f8fa;         "
+      , "  background-color: #f0f0f0;         "
       , "  display: inline-block              "
       , "}                                    "
       , "blockquote {                         "
