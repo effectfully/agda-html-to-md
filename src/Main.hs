@@ -25,6 +25,23 @@ extractStyle
     . snd
     . breakOn "<style"
 
+tweakStyle :: Text -> Text
+tweakStyle text = mconcat [beforeA, style, afterA] where
+    (beforeA, afterA) = fmap (snd . unsafeBreakDrop "}") $ unsafeBreakDrop "      a {" text
+
+    style = Text.unlines $ Prelude.map ("      " <>)
+      [ "code {                               "
+      , "  white-space: pre;                  "
+      , "  background-color: #f6f8fa;         "
+      , "  display: inline-block              "
+      , "}                                    "
+      , "blockquote {                         "
+      , "  padding: 0 1em;                    "
+      , "  color: #6a737d;                    "
+      , "  border-left: 0.25em solid #d1d5da; "
+      , "}                                    "
+      ]
+
 transformAfter :: Text -> (Text -> Text) -> Text -> Text
 transformAfter after trans text = case splitOn after text of
     []     -> error "The impossible happened"
@@ -52,6 +69,6 @@ formatAgdaCode = transformAfter start extractCode where
         (code, rest) = unsafeBreakDrop "<span class=\"comment-delimiter\">```" $ afterSpan part
 
 htmlToMd :: Text -> Text
-htmlToMd = formatAgdaCode . formatNormalText . extractStyle
+htmlToMd = formatAgdaCode . formatNormalText . tweakStyle . extractStyle
 
 main = Text.interact htmlToMd
